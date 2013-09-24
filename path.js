@@ -1,5 +1,9 @@
 var Path = {
     'version': "0.8.4",
+    'listenIntervalId': null,
+    'hashchangeEventSupport': function () {
+        return ("onhashchange" in window && (!document.documentMode || document.documentMode >= 8));
+    },
     'map': function (path) {
         if (Path.routes.defined.hasOwnProperty(path)) {
             return Path.routes.defined[path];
@@ -115,15 +119,30 @@ var Path = {
 
         // The 'document.documentMode' checks below ensure that PathJS fires the right events
         // even in IE "Quirks Mode".
-        if ("onhashchange" in window && (!document.documentMode || document.documentMode >= 8)) {
+        if (Path.hashchangeEventSupport()) {
             window.onhashchange = fn;
         } else {
-            setInterval(fn, 50);
+            Path.listenIntervalId = setInterval(fn, 50);
         }
 
         if(location.hash !== "") {
             Path.dispatch(location.hash);
         }
+    },
+    'reset': function () {
+        if (Path.hashchangeEventSupport) {
+            window.onhashchange = null;
+        } else {
+            window.clearInterval(Path.listenIntervalId);
+        }
+
+        Path.routes = {
+            'current': null,
+            'root': null,
+            'rescue': null,
+            'previous': null,
+            'defined': {}
+        };
     },
     'core': {
         'route': function (path) {
