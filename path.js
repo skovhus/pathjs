@@ -122,7 +122,7 @@ var Path = {
         if (Path.hashchangeEventSupport()) {
             window.onhashchange = fn;
         } else {
-            Path.listenIntervalId = setInterval(fn, 50);
+            Path.listenIntervalId = window.setInterval(fn, 50);
         }
 
         if(location.hash !== "") {
@@ -130,7 +130,7 @@ var Path = {
         }
     },
     'reset': function () {
-        if (Path.hashchangeEventSupport) {
+        if (Path.hashchangeEventSupport()) {
             window.onhashchange = null;
         } else {
             window.clearInterval(Path.listenIntervalId);
